@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "name": "MY Notes",
+  "description": "This is a Chrome extension built with React and TypeScript",
+  "icons": {
+    "16": "js/icons/note16.png",
+    "32": "js/icons/note32.png",
+    "48": "js/icons/note48.png"
+  },
+  "action": {
+    "default_popup": "js/index.html",
+    "default_title": "MyNotes"      
+  }
+}

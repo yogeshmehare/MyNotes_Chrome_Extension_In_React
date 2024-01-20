@@ -1,24 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
 
 function App() {
+  //variables
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [showInputFields, setshowInputFields] = useState(false);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="container">
+        <h1>Hio</h1>
+        <button
+          id="createNoteButton"
+          onClick={(event: React.MouseEvent<HTMLElement>) =>
+            setshowInputFields(true)
+          }
         >
-          Learn React
-        </a>
-      </header>
+          Create new note
+        </button>
+
+        {showInputFields && (
+          <div>
+            <input
+              type="text"
+              placeholder="Enter Title for Note"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            ></input>
+            <input
+              type="text"
+              placeholder="Enter Title for Note"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            ></input>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
