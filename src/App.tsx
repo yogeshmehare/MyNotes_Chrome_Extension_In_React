@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import TextField from "@mui/material/TextField";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,19 +13,47 @@ function App() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [showInputFields, setshowInputFields] = useState(false);
+  const [notes, setNotes] = useState<any[]>([])
 
   function makeNoteFeildsEmpty() {
     setTitle("");
     setContent("");
   }
 
+
+  useEffect(() => {
+    FetchNotesFromDB()
+    return () => {
+    }
+  },[])
+
+  async function FetchNotesFromDB() {
+    let apiCallToFetchNotesFromDB = "http://localhost:3000/api/getNotes";
+    try {
+      const response = await fetch(apiCallToFetchNotesFromDB, {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      console.log("Success:", result);
+      setNotes(result)
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
   async function AddNoteToDB() {
     // chrome.runtime.sendMessage({name:"fetchNotes"},(response=>{
     //   console.log(response)
     // }))
     console.log("hiiiii");
-    let apiCall = "http://localhost:3000/api/getNotes";
-
     let apiCallInsertNote = "http://localhost:3000/api/insertNote";
 
     let userData = { title: title, content: content };
@@ -41,6 +69,8 @@ function App() {
       });
 
       const result = await response.json();
+      setNotes(notes=>[...notes, result])
+      // FetchNotesFromDB()
       console.log("Success:", result);
     } catch (error) {
       console.log(error);
@@ -63,7 +93,7 @@ function App() {
               Create new note
             </Button>
 
-            <NotesListComponent />
+            <NotesListComponent notes={notes}/>
           </div>
         )}
         {showInputFields && (

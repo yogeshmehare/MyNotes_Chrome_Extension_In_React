@@ -1,6 +1,8 @@
 import { createRequire } from 'module';
 import express from "express";
 const require = createRequire(import.meta.url);
+const ObjectId = require('mongodb').ObjectId;
+
 
 const app = express();
 app.use(express.json())
@@ -33,23 +35,22 @@ app.post('/api/insertNote', (req, res) => {
   let title = req.body.title
   let content = req.body.content
 
-  db.collection("Notes").insertOne({title : title, content: content}).then((result)=> {
+  db.collection("Notes").insertOne({title : title, content: content}).then(async(result)=> {
     console.log(
       `A document was inserted with the _id: ${result.insertedId}`, 
     );
-    // res.status(200).json({"id":result.insertedId,"name":user.userName,"email":user.email})
-    res.status(200).send()
+    // res.status(200).send()
+    let data = await db.collection("Notes").findOne({_id: new ObjectId(result.insertedId)})
+    res.send(JSON.stringify(data)).status(200)
+
   }).catch((err)=>{res.status(500).json({err:"Couldn't create note "+err})});
 });
 
-app.get('/api/getNotes', async(req, res) => {
+app.get('/api/getNotes', async(req, res) => { 
   console.log("req came")
   let data = await db.collection("Notes").find().toArray()
-  data.forEach(element => {
-    console.log(element.NOTE1)
-  });
-  res.send(data).status(200)
-  // console.log(data)
+  res.send(JSON.stringify(data)).status(200)
+  console.log(data)
   console.log("done")
   // .then((result)=> {
   //   console.log(
