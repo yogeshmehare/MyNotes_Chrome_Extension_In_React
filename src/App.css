@@ -1,11 +1,7 @@
 .App {
-  color: white;
   text-align: center;
-}
-
-.container {
-  width: 50rem;
-  height: 25rem;
+  width: 600px;
+  height: 400px;
 }
 
 .margin10 {

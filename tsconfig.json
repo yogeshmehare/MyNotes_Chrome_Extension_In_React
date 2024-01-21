@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "service_worker.ts"  ]
 }

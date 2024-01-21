@@ -6,6 +6,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Stack from "@mui/material/Stack";
+import NotesListComponent from "./comp/NotesListComponent";
 
 function App() {
   //variables
@@ -14,26 +15,56 @@ function App() {
   const [showInputFields, setshowInputFields] = useState(false);
 
   function makeNoteFeildsEmpty() {
-    setTitle("")
-    setContent("")
+    setTitle("");
+    setContent("");
+  }
+
+  async function AddNoteToDB() {
+    // chrome.runtime.sendMessage({name:"fetchNotes"},(response=>{
+    //   console.log(response)
+    // }))
+    console.log("hiiiii");
+    let apiCall = "http://localhost:3000/api/getNotes";
+
+    let apiCallInsertNote = "http://localhost:3000/api/insertNote";
+
+    let userData = { title: title, content: content };
+    console.log(userData);
+    try {
+      const response = await fetch(apiCallInsertNote, {
+        method: "POST", // or 'PUT'
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+      console.log("Success:", result);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
     <div className="App">
-      <div className="container">
-        <h1>Hio</h1>
-
+      <div className="">
         {!showInputFields && (
-          <Button
-            variant="contained"
-            id="createNoteButton"
-            color="primary"
-            onClick={(event: React.MouseEvent<HTMLElement>) =>
-              setshowInputFields(true)
-            }
-          >
-            Create new note
-          </Button>
+          <div>
+            <Button
+              variant="contained"
+              id="createNoteButton"
+              color="primary"
+              onClick={(_event: React.MouseEvent<HTMLElement>) =>
+                setshowInputFields(true)
+              }
+            >
+              Create new note
+            </Button>
+
+            <NotesListComponent />
+          </div>
         )}
         {showInputFields && (
           <div>
@@ -44,7 +75,7 @@ function App() {
               placeholder="Enter Title for Note"
               margin="dense"
               fullWidth
-              style={{"marginRight":"20px","paddingLeft":"10px"}}
+              style={{ marginLeft: "20px", marginRight: "20px" }}
               value={title}
               color={title.length > 0 ? "success" : "secondary"}
               onChange={(e) => setTitle(e.target.value)}
@@ -58,23 +89,27 @@ function App() {
               placeholder="Enter Note"
               margin="dense"
               fullWidth
-              style={{"marginRight":"20px","paddingLeft":"10px"}}
+              style={{ marginLeft: "20px", marginRight: "20px" }}
               color={content.length > 0 ? "success" : "secondary"}
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
-            <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
+            <Stack
+              direction="row"
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
               <Button
                 variant="contained"
                 color="primary"
                 endIcon={<CheckCircleIcon color="success" />}
                 id="createNoteButton"
-                onClick={(event: React.MouseEvent<HTMLElement>) =>
-                  {
-                    setshowInputFields(false)
-                    makeNoteFeildsEmpty()
-                  }
-                }
+                onClick={(_event: React.MouseEvent<HTMLElement>) => {
+                  setshowInputFields(false);
+                  makeNoteFeildsEmpty();
+                  AddNoteToDB();
+                }}
               >
                 Create
               </Button>
@@ -83,12 +118,10 @@ function App() {
                 color="primary"
                 endIcon={<DeleteIcon color="error" />}
                 id="closeNoteButton"
-                onClick={(event: React.MouseEvent<HTMLElement>) =>
-                  {
-                    setshowInputFields(false);
-                    makeNoteFeildsEmpty()
-                  }
-                }
+                onClick={(_event: React.MouseEvent<HTMLElement>) => {
+                  setshowInputFields(false);
+                  makeNoteFeildsEmpty();
+                }}
               >
                 Close
               </Button>
@@ -101,4 +134,3 @@ function App() {
 }
 
 export default App;
-
