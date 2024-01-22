@@ -60,7 +60,7 @@ function App() {
     console.log(userData);
     try {
       const response = await fetch(apiCallInsertNote, {
-        method: "POST", // or 'PUT'
+        method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",

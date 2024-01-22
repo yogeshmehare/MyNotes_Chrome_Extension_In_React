@@ -2,23 +2,25 @@ import { createRequire } from 'module';
 import express from "express";
 const require = createRequire(import.meta.url);
 const ObjectId = require('mongodb').ObjectId;
-
-
 const app = express();
 app.use(express.json())
+const dotenv = require('dotenv');
+dotenv.config()
 const port = 3000;
 
 const { MongoClient } = require("mongodb");
-const uri = "mongodb://127.0.0.1:27017/"
+// const uri = "mongodb://127.0.0.1:27017/"
 let db
-function connectToDB(cb) {
-  MongoClient.connect(uri).then((client)=>{
-    db = client.db("WebNotesDB")
+let Notes
+function connectToLocalDB(cb) {
+  Notes = process.env.COLLECTION_NAME
+  MongoClient.connect(process.env.DB_CONN_STRING).then((client)=>{
+    db = client.db(process.env.DB_NAME)
     return cb()
   }).catch((err)=>{console.log(err);return cb(err)})
 }
 
-connectToDB((err)=>{
+connectToLocalDB((err)=>{
   if(!err){
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
@@ -35,12 +37,12 @@ app.post('/api/insertNote', (req, res) => {
   let title = req.body.title
   let content = req.body.content
 
-  db.collection("Notes").insertOne({title : title, content: content}).then(async(result)=> {
+  db.collection(Notes).insertOne({title : title, content: content}).then(async(result)=> {
     console.log(
       `A document was inserted with the _id: ${result.insertedId}`, 
     );
     // res.status(200).send()
-    let data = await db.collection("Notes").findOne({_id: new ObjectId(result.insertedId)})
+    let data = await db.collection(Notes).findOne({_id: new ObjectId(result.insertedId)})
     res.send(JSON.stringify(data)).status(200)
 
   }).catch((err)=>{res.status(500).json({err:"Couldn't create note "+err})});
@@ -48,7 +50,7 @@ app.post('/api/insertNote', (req, res) => {
 
 app.get('/api/getNotes', async(req, res) => { 
   console.log("req came")
-  let data = await db.collection("Notes").find().toArray()
+  let data = await db.collection(Notes).find().toArray()
   res.send(JSON.stringify(data)).status(200)
   console.log(data)
   console.log("done")
