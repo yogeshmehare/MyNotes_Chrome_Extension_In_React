@@ -7,8 +7,8 @@ app.use(express.json())
 const dotenv = require('dotenv');
 dotenv.config()
 const port = 3000;
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const { MongoClient } = require("mongodb");
 // const uri = "mongodb://127.0.0.1:27017/"
 let db
 let Notes
@@ -20,7 +20,43 @@ function connectToLocalDB(cb) {
   }).catch((err)=>{console.log(err);return cb(err)})
 }
 
-connectToLocalDB((err)=>{
+// connectToLocalDB((err)=>{
+//   if(!err){
+//     app.listen(port, () => {
+//       console.log(`Server is running on port ${port}`);
+//     });    
+//   }
+// })
+
+function connectToAtlasDB(cb){
+  // console.log(process.env.DB_CONN_STRING)
+  Notes = process.env.COLLECTION_NAME
+  const client = new MongoClient(process.env.DB_CONN_STRING, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+  });
+
+  async function run() {
+    try {
+      await client.connect();
+      // Send a ping to confirm a successful connection
+      await client.db(process.env.DB_NAME).command({ ping: 1 });
+      console.log("Pinged your deployment. You successfully connected to MongoDB!");
+      db = client.db(process.env.DB_NAME)
+      return cb()
+    } finally {
+      // Ensures that the client will close when you finish/error
+      // await client.close();
+    }
+  }
+  run().catch((err)=>{console.log(err);return cb(err)});
+}
+
+connectToAtlasDB((err)=>{
+  console.log(err)
   if(!err){
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
